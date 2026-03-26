@@ -1,5 +1,6 @@
 import type {
   Workspace,
+  WorkspaceStatus,
   CreateWorkspaceRequest,
   UpdateStateRequest,
   AddCommentRequest,
@@ -28,8 +29,38 @@ async function apiFetch<T>(url: string, options?: RequestInit): Promise<T> {
   return res.text() as unknown as T;
 }
 
+interface ApiWorkspace {
+  metadata: {
+    id: string;
+    name: string;
+    repo_path: string;
+    base: string;
+    head: string;
+  };
+  state: {
+    status: WorkspaceStatus;
+  };
+  comments?: Comment[];
+}
+
+function mapApiWorkspace(raw: ApiWorkspace): Workspace {
+  return {
+    id: raw.metadata.id,
+    name: raw.metadata.name,
+    repo_path: raw.metadata.repo_path,
+    base: raw.metadata.base,
+    head: raw.metadata.head,
+    status: raw.state.status,
+    created_at: "",
+    comments: raw.comments ?? [],
+  };
+}
+
 export const api = {
-  listWorkspaces: () => apiFetch<Workspace[]>("/workspaces"),
+  listWorkspaces: async () => {
+    const raw = await apiFetch<ApiWorkspace[]>("/workspaces");
+    return raw.map(mapApiWorkspace);
+  },
 
   createWorkspace: (data: CreateWorkspaceRequest) =>
     apiFetch<Workspace>("/workspaces", {
