@@ -1,18 +1,21 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import type { CreateWorkspaceRequest, UpdateStateRequest, AddCommentRequest } from "@/types/workspace";
+import { MOCK_WORKSPACES, MOCK_DIFF, shouldUseMock } from "@/lib/mock-data";
+import type { Workspace, CreateWorkspaceRequest, UpdateStateRequest, AddCommentRequest } from "@/types/workspace";
 
 export function useWorkspaces() {
   return useQuery({
     queryKey: ["workspaces"],
-    queryFn: api.listWorkspaces,
+    queryFn: shouldUseMock() ? () => Promise.resolve(MOCK_WORKSPACES) : api.listWorkspaces,
   });
 }
 
 export function useWorkspace(id: string) {
   return useQuery({
     queryKey: ["workspace", id],
-    queryFn: () => api.getWorkspace(id),
+    queryFn: shouldUseMock()
+      ? () => Promise.resolve(MOCK_WORKSPACES.find((w) => w.id === id) as Workspace)
+      : () => api.getWorkspace(id),
     enabled: !!id,
   });
 }
@@ -20,7 +23,7 @@ export function useWorkspace(id: string) {
 export function useDiff(id: string) {
   return useQuery({
     queryKey: ["diff", id],
-    queryFn: () => api.getDiff(id),
+    queryFn: shouldUseMock() ? () => Promise.resolve(MOCK_DIFF) : () => api.getDiff(id),
     enabled: !!id,
   });
 }
