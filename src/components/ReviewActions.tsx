@@ -35,9 +35,9 @@ export function ReviewActions({ currentStatus, onUpdate, isPending }: ReviewActi
           onClick={() => onUpdate("ACCEPTED")}
           disabled={isPending || (isLocked && currentStatus !== "ACCEPTED")}
           size="sm"
-          variant={currentStatus === "ACCEPTED" ? "default" : "outline"}
+          variant={currentStatus === "ACCEPTED" || !isLocked ? "default" : "outline"}
           className={
-            currentStatus === "ACCEPTED"
+            currentStatus === "ACCEPTED" || !isLocked
               ? "bg-status-accepted hover:bg-status-accepted/90 text-primary-foreground"
               : ""
           }
@@ -48,9 +48,9 @@ export function ReviewActions({ currentStatus, onUpdate, isPending }: ReviewActi
           onClick={() => onUpdate("REQUIRE_CHANGES")}
           disabled={isPending || (isLocked && currentStatus !== "REQUIRE_CHANGES")}
           size="sm"
-          variant={currentStatus === "REQUIRE_CHANGES" ? "default" : "outline"}
+          variant={currentStatus === "REQUIRE_CHANGES" || !isLocked ? "default" : "outline"}
           className={
-            currentStatus === "REQUIRE_CHANGES"
+            currentStatus === "REQUIRE_CHANGES" || !isLocked
               ? "bg-status-changes hover:bg-status-changes/90 text-primary-foreground"
               : ""
           }
@@ -61,7 +61,7 @@ export function ReviewActions({ currentStatus, onUpdate, isPending }: ReviewActi
           onClick={() => setDeclineOpen(true)}
           disabled={isPending || (isLocked && currentStatus !== "DECLINED")}
           size="sm"
-          variant={currentStatus === "DECLINED" ? "destructive" : "outline"}
+          variant={currentStatus === "DECLINED" || !isLocked ? "destructive" : "outline"}
         >
           <X className="h-4 w-4 mr-1" /> Decline
         </Button>
