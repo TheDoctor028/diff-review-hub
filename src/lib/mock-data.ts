@@ -1,4 +1,5 @@
 import type { Workspace, Comment } from "@/types/workspace";
+import { config } from "@/lib/config";
 
 export const MOCK_WORKSPACES: Workspace[] = [
   {
