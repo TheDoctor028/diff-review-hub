@@ -134,7 +134,7 @@ function DiffLineRow({ line, filename, comments, onAddComment, onDeleteComment }
       </tr>
       {(showInput || comments.length > 0) && (
         <tr>
-          <td colSpan={3} className="px-4 py-2 bg-muted/30 border-y">
+          <td colSpan={4} className="px-4 py-2 bg-muted/30 border-y">
             <div className="space-y-2 max-w-2xl">
               {comments.map((c) => (
                 <div key={c.id} className="flex items-start justify-between gap-2 bg-card rounded-md p-2.5 border text-sm animate-fade-in">
