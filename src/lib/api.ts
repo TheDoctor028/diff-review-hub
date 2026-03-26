@@ -43,6 +43,49 @@ interface ApiWorkspace {
   comments?: Comment[];
 }
 
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function isApiWorkspace(value: unknown): value is ApiWorkspace {
+  return (
+    isObject(value) &&
+    isObject(value.metadata) &&
+    typeof value.metadata.id === "string" &&
+    typeof value.metadata.name === "string" &&
+    typeof value.metadata.repo_path === "string" &&
+    typeof value.metadata.base === "string" &&
+    typeof value.metadata.head === "string" &&
+    isObject(value.state) &&
+    typeof value.state.status === "string"
+  );
+}
+
+function extractWorkspaceArray(raw: unknown): unknown[] {
+  if (typeof raw === "string") {
+    try {
+      return extractWorkspaceArray(JSON.parse(raw));
+    } catch {
+      return [];
+    }
+  }
+
+  if (Array.isArray(raw)) return raw;
+  if (!isObject(raw)) return [];
+
+  const prioritizedKeys = ["workspaces", "data", "items", "results"];
+  for (const key of prioritizedKeys) {
+    const candidate = raw[key];
+    if (Array.isArray(candidate)) return candidate;
+  }
+
+  for (const value of Object.values(raw)) {
+    if (Array.isArray(value)) return value;
+  }
+
+  return [];
+}
+
 function mapApiWorkspace(raw: ApiWorkspace): Workspace {
   return {
     id: raw.metadata.id,
@@ -58,8 +101,8 @@ function mapApiWorkspace(raw: ApiWorkspace): Workspace {
 
 export const api = {
   listWorkspaces: async () => {
-    const raw = await apiFetch<ApiWorkspace[] | Record<string, unknown>>("/workspaces");
-    const list = Array.isArray(raw) ? raw : (Object.values(raw).find(Array.isArray) as ApiWorkspace[] ?? []);
+    const raw = await apiFetch<unknown>("/workspaces");
+    const list = extractWorkspaceArray(raw).filter(isApiWorkspace);
     return list.map(mapApiWorkspace);
   },
 
