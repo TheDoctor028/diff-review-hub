@@ -5,8 +5,9 @@ import type {
   AddCommentRequest,
   Comment,
 } from "@/types/workspace";
+import { config } from "@/lib/config";
 
-const API_BASE = "/api";
+const API_BASE = config.apiBaseUrl;
 
 async function apiFetch<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${url}`, {
