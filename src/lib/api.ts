@@ -58,8 +58,9 @@ function mapApiWorkspace(raw: ApiWorkspace): Workspace {
 
 export const api = {
   listWorkspaces: async () => {
-    const raw = await apiFetch<ApiWorkspace[]>("/workspaces");
-    return raw.map(mapApiWorkspace);
+    const raw = await apiFetch<ApiWorkspace[] | Record<string, unknown>>("/workspaces");
+    const list = Array.isArray(raw) ? raw : (Object.values(raw).find(Array.isArray) as ApiWorkspace[] ?? []);
+    return list.map(mapApiWorkspace);
   },
 
   createWorkspace: (data: CreateWorkspaceRequest) =>
