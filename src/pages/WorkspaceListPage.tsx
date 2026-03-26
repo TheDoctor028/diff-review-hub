@@ -12,9 +12,12 @@ import { useMemo } from "react";
 function WorkspaceCard({ ws, onDelete }: { ws: Workspace; onDelete: (e: React.MouseEvent, id: string) => void }) {
   const navigate = useNavigate();
   return (
-    <button
+    <div
+      role="button"
+      tabIndex={0}
       onClick={() => navigate(`/workspace/${ws.id}`)}
-      className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors text-left animate-fade-in group"
+      onKeyDown={(e) => { if (e.key === "Enter") navigate(`/workspace/${ws.id}`); }}
+      className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors text-left animate-fade-in group cursor-pointer"
     >
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-3 mb-1">
@@ -33,7 +36,7 @@ function WorkspaceCard({ ws, onDelete }: { ws: Workspace; onDelete: (e: React.Mo
       >
         <Trash2 className="h-4 w-4" />
       </Button>
-    </button>
+    </div>
   );
 }
 
