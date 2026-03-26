@@ -20,6 +20,8 @@ export function ReviewActions({ currentStatus, onUpdate, isPending }: ReviewActi
   const [declineOpen, setDeclineOpen] = useState(false);
   const [reason, setReason] = useState("");
 
+  const isLocked = currentStatus !== "TO_REVIEW";
+
   const handleDecline = () => {
     onUpdate("DECLINED", reason || undefined);
     setDeclineOpen(false);
@@ -31,25 +33,35 @@ export function ReviewActions({ currentStatus, onUpdate, isPending }: ReviewActi
       <div className="flex flex-wrap gap-2">
         <Button
           onClick={() => onUpdate("ACCEPTED")}
-          disabled={isPending || currentStatus === "ACCEPTED"}
-          className="bg-status-accepted hover:bg-status-accepted/90 text-primary-foreground"
+          disabled={isPending || (isLocked && currentStatus !== "ACCEPTED")}
           size="sm"
+          variant={currentStatus === "ACCEPTED" ? "default" : "outline"}
+          className={
+            currentStatus === "ACCEPTED"
+              ? "bg-status-accepted hover:bg-status-accepted/90 text-primary-foreground"
+              : ""
+          }
         >
           <Check className="h-4 w-4 mr-1" /> Accept
         </Button>
         <Button
           onClick={() => onUpdate("REQUIRE_CHANGES")}
-          disabled={isPending || currentStatus === "REQUIRE_CHANGES"}
-          className="bg-status-changes hover:bg-status-changes/90 text-primary-foreground"
+          disabled={isPending || (isLocked && currentStatus !== "REQUIRE_CHANGES")}
           size="sm"
+          variant={currentStatus === "REQUIRE_CHANGES" ? "default" : "outline"}
+          className={
+            currentStatus === "REQUIRE_CHANGES"
+              ? "bg-status-changes hover:bg-status-changes/90 text-primary-foreground"
+              : ""
+          }
         >
           <AlertTriangle className="h-4 w-4 mr-1" /> Request Changes
         </Button>
         <Button
           onClick={() => setDeclineOpen(true)}
-          disabled={isPending || currentStatus === "DECLINED"}
-          variant="destructive"
+          disabled={isPending || (isLocked && currentStatus !== "DECLINED")}
           size="sm"
+          variant={currentStatus === "DECLINED" ? "destructive" : "outline"}
         >
           <X className="h-4 w-4 mr-1" /> Decline
         </Button>
