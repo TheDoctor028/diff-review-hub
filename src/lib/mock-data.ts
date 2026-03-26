@@ -113,8 +113,6 @@ index 1234567..89abcde 100644
  }
 `;
 
-const USE_MOCK = true;
-
 export function shouldUseMock(): boolean {
-  return USE_MOCK;
+  return config.useMockData;
 }
