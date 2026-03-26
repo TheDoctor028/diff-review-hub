@@ -54,7 +54,7 @@ export default function WorkspaceListPage() {
         )}
 
         <div className="grid gap-3">
-          {workspaces?.map((ws) => (
+          {Array.isArray(workspaces) && workspaces.map((ws) => (
             <button
               key={ws.id}
               onClick={() => navigate(`/workspace/${ws.id}`)}
