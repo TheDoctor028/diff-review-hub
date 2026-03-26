@@ -6,11 +6,49 @@ import { useNavigate } from "react-router-dom";
 import { Trash2, GitBranch, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import type { Workspace } from "@/types/workspace";
+import { useMemo } from "react";
+
+function WorkspaceCard({ ws, onDelete }: { ws: Workspace; onDelete: (e: React.MouseEvent, id: string) => void }) {
+  const navigate = useNavigate();
+  return (
+    <button
+      onClick={() => navigate(`/workspace/${ws.id}`)}
+      className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors text-left animate-fade-in group"
+    >
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-3 mb-1">
+          <span className="font-mono font-semibold text-foreground truncate">{ws.name}</span>
+          <StatusBadge status={ws.status} />
+        </div>
+        <p className="text-xs text-muted-foreground font-mono truncate">
+          {ws.base} ← {ws.head}
+        </p>
+      </div>
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={(e) => onDelete(e, ws.id)}
+        className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
+      >
+        <Trash2 className="h-4 w-4" />
+      </Button>
+    </button>
+  );
+}
 
 export default function WorkspaceListPage() {
   const { data: workspaces, isLoading, error } = useWorkspaces();
   const deleteWs = useDeleteWorkspace();
   const navigate = useNavigate();
+
+  const { toReview, reviewed } = useMemo(() => {
+    if (!Array.isArray(workspaces)) return { toReview: [], reviewed: [] };
+    return {
+      toReview: workspaces.filter((ws) => ws.status === "TO_REVIEW"),
+      reviewed: workspaces.filter((ws) => ws.status !== "TO_REVIEW"),
+    };
+  }, [workspaces]);
 
   const handleDelete = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
@@ -53,33 +91,31 @@ export default function WorkspaceListPage() {
           </div>
         )}
 
-        <div className="grid gap-3">
-          {Array.isArray(workspaces) && workspaces.map((ws) => (
-            <button
-              key={ws.id}
-              onClick={() => navigate(`/workspace/${ws.id}`)}
-              className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors text-left animate-fade-in group"
-            >
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-3 mb-1">
-                  <span className="font-mono font-semibold text-foreground truncate">{ws.name}</span>
-                  <StatusBadge status={ws.status} />
-                </div>
-                <p className="text-xs text-muted-foreground font-mono truncate">
-                  {ws.base} ← {ws.head}
-                </p>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={(e) => handleDelete(e, ws.id)}
-                className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </button>
-          ))}
-        </div>
+        {toReview.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-sm font-semibold font-mono text-muted-foreground uppercase tracking-wider mb-3">
+              To Review ({toReview.length})
+            </h2>
+            <div className="grid gap-3">
+              {toReview.map((ws) => (
+                <WorkspaceCard key={ws.id} ws={ws} onDelete={handleDelete} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {reviewed.length > 0 && (
+          <div>
+            <h2 className="text-sm font-semibold font-mono text-muted-foreground uppercase tracking-wider mb-3">
+              Reviewed ({reviewed.length})
+            </h2>
+            <div className="grid gap-3">
+              {reviewed.map((ws) => (
+                <WorkspaceCard key={ws.id} ws={ws} onDelete={handleDelete} />
+              ))}
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
