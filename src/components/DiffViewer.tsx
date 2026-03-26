@@ -104,13 +104,24 @@ function DiffLineRow({ line, filename, comments, onAddComment, onDeleteComment }
   return (
     <>
       <tr className={rowClass}>
+        <td className="select-none w-8 text-center py-0 align-top">
+          {isCommentable && (
+            <button
+              onClick={() => setShowInput(true)}
+              className="opacity-0 group-hover:opacity-100 transition-opacity text-primary hover:text-primary/80 py-0.5"
+              aria-label="Add comment"
+            >
+              <MessageSquarePlus className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </td>
         <td className="select-none text-right px-2 py-0 w-12 text-diff-line-number text-xs align-top">
           {line.oldLine ?? ""}
         </td>
         <td className="select-none text-right px-2 py-0 w-12 text-diff-line-number text-xs align-top border-r">
           {line.newLine ?? ""}
         </td>
-        <td className="relative px-4 py-0 whitespace-pre">
+        <td className="px-4 py-0 whitespace-pre">
           <span className={cn(
             line.type === "add" && "text-diff-add-fg",
             line.type === "remove" && "text-diff-remove-fg",
@@ -119,15 +130,6 @@ function DiffLineRow({ line, filename, comments, onAddComment, onDeleteComment }
           )}>
             {line.type === "hunk" || line.type === "header" ? line.content : `${prefix}${line.content}`}
           </span>
-          {isCommentable && (
-            <button
-              onClick={() => setShowInput(true)}
-              className="absolute right-2 top-0 opacity-0 group-hover:opacity-100 transition-opacity text-primary hover:text-primary/80"
-              aria-label="Add comment"
-            >
-              <MessageSquarePlus className="h-3.5 w-3.5" />
-            </button>
-          )}
         </td>
       </tr>
       {(showInput || comments.length > 0) && (
