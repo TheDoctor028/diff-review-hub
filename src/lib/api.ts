@@ -15,6 +15,7 @@ async function apiFetch<T>(url: string, options?: RequestInit): Promise<T> {
     ...options,
     headers: {
       "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "true",
       ...options?.headers,
     },
   });
@@ -121,7 +122,9 @@ export const api = {
     apiFetch<void>(`/workspaces/${id}`, { method: "DELETE" }),
 
   getDiff: async (id: string): Promise<string> => {
-    const res = await fetch(`${API_BASE}/workspaces/${id}/diff`);
+    const res = await fetch(`${API_BASE}/workspaces/${id}/diff`, {
+      headers: { "ngrok-skip-browser-warning": "true" },
+    });
     if (!res.ok) throw new Error(`Failed to fetch diff: ${res.status}`);
     return res.text();
   },
