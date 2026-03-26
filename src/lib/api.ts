@@ -23,11 +23,12 @@ async function apiFetch<T>(url: string, options?: RequestInit): Promise<T> {
     const text = await res.text();
     throw new Error(`API error ${res.status}: ${text}`);
   }
-  const contentType = res.headers.get("content-type");
-  if (contentType?.includes("application/json")) {
-    return res.json();
+  const text = await res.text();
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    return text as unknown as T;
   }
-  return res.text() as unknown as T;
 }
 
 interface ApiWorkspace {
