@@ -28,7 +28,7 @@ export function GeneralComments({ comments, onAdd, onDelete }: GeneralCommentsPr
       </div>
       <div className="p-4 space-y-3">
         {comments.map((c) => (
-          <div key={c.id} className="flex items-start justify-between gap-2 bg-muted/30 rounded-md p-3 border text-sm animate-fade-in">
+          <div key={c.id} className="flex items-start justify-between gap-2 rounded-md p-3 text-sm animate-fade-in border-2 bg-secondary">
             <p className="text-foreground whitespace-pre-wrap">{c.text}</p>
             <button onClick={() => onDelete(c.id)} className="text-muted-foreground hover:text-destructive shrink-0">
               <Trash2 className="h-3.5 w-3.5" />
