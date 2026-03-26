@@ -1,0 +1,66 @@
+import type {
+  Workspace,
+  CreateWorkspaceRequest,
+  UpdateStateRequest,
+  AddCommentRequest,
+  Comment,
+} from "@/types/workspace";
+
+const API_BASE = "/api";
+
+async function apiFetch<T>(url: string, options?: RequestInit): Promise<T> {
+  const res = await fetch(`${API_BASE}${url}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`API error ${res.status}: ${text}`);
+  }
+  const contentType = res.headers.get("content-type");
+  if (contentType?.includes("application/json")) {
+    return res.json();
+  }
+  return res.text() as unknown as T;
+}
+
+export const api = {
+  listWorkspaces: () => apiFetch<Workspace[]>("/workspaces"),
+
+  createWorkspace: (data: CreateWorkspaceRequest) =>
+    apiFetch<Workspace>("/workspaces", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  getWorkspace: (id: string) => apiFetch<Workspace>(`/workspaces/${id}`),
+
+  deleteWorkspace: (id: string) =>
+    apiFetch<void>(`/workspaces/${id}`, { method: "DELETE" }),
+
+  getDiff: async (id: string): Promise<string> => {
+    const res = await fetch(`${API_BASE}/workspaces/${id}/diff`);
+    if (!res.ok) throw new Error(`Failed to fetch diff: ${res.status}`);
+    return res.text();
+  },
+
+  updateState: (id: string, data: UpdateStateRequest) =>
+    apiFetch<Workspace>(`/workspaces/${id}/state`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  addComment: (id: string, data: AddCommentRequest) =>
+    apiFetch<Comment>(`/workspaces/${id}/comments`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  deleteComment: (id: string, commentId: string) =>
+    apiFetch<void>(`/workspaces/${id}/comments/${commentId}`, {
+      method: "DELETE",
+    }),
+};
