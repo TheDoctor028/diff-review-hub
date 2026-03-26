@@ -68,7 +68,10 @@ export const api = {
       body: JSON.stringify(data),
     }),
 
-  getWorkspace: (id: string) => apiFetch<Workspace>(`/workspaces/${id}`),
+  getWorkspace: async (id: string) => {
+    const raw = await apiFetch<ApiWorkspace>(`/workspaces/${id}`);
+    return mapApiWorkspace(raw);
+  },
 
   deleteWorkspace: (id: string) =>
     apiFetch<void>(`/workspaces/${id}`, { method: "DELETE" }),
